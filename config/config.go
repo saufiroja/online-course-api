@@ -14,7 +14,7 @@ type AppConfig struct {
 	Fiber struct {
 		Port string
 	}
-	Postgres struct {
+	Mysql struct {
 		Host string
 		Port string
 		User string
@@ -37,7 +37,7 @@ func NewAppConfig() *AppConfig {
 
 		initApp(appConfig)
 		initFiber(appConfig)
-		initPostgres(appConfig)
+		initMysql(appConfig)
 	}
 
 	return appConfig

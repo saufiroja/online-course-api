@@ -1,14 +1,8 @@
 package server
 
 import (
-	"project/go-fiber-boilerplate/config"
-	"project/go-fiber-boilerplate/infrastructure/database"
-	authHandler "project/go-fiber-boilerplate/infrastructure/http/handler/auth"
-	userHandler "project/go-fiber-boilerplate/infrastructure/http/handler/user"
-	"project/go-fiber-boilerplate/infrastructure/http/routes"
-	"project/go-fiber-boilerplate/repository/postgres"
-	authService "project/go-fiber-boilerplate/service/auth"
-	userService "project/go-fiber-boilerplate/service/user"
+	"github.com/saufiroja/online-course-api/config"
+	"github.com/saufiroja/online-course-api/infrastructure/http/routes"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -38,28 +32,7 @@ func Server() *fiber.App {
 		})
 	})
 
-	initilized(app, conf)
+	routes.Initilized(app, conf)
 
 	return app
-}
-
-func initilized(app *fiber.App, conf *config.AppConfig) {
-	db := database.NewPostgres(conf)
-	// repository
-	authRepository := postgres.NewAuthRepository(db)
-	userRepository := postgres.NewUserRepository(db)
-	// service
-	authService := authService.NewAuthService(authRepository)
-	userService := userService.NewUserService(userRepository)
-
-	// controllers
-	authControllers := authHandler.NewAuthControllers(authService)
-	userControllers := userHandler.NewUserControllers(userService)
-
-	routes := routes.NewRoutes(
-		authControllers,
-		userControllers,
-	)
-
-	routes.InitRoutes(app)
 }

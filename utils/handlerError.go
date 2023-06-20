@@ -6,7 +6,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func HandlerError(err error) error {
+func HandlerErrorValidator(err error) error {
 	var message string
 	var code int
 
@@ -26,24 +26,36 @@ func HandlerError(err error) error {
 		}
 	}
 
-	return HandlerErrorCustom(code, message)
+	return HandlerError(code, message)
 }
 
-type Response struct {
+type Error struct {
 	Message string `json:"message"`
 	Code    int    `json:"code"`
 }
 
-func (r *Response) Error() string {
+func (r *Error) Error() string {
 	return r.Message
 }
 
-func (r *Response) GetCode() int {
-	return r.Code
+func (e *Error) StatusCode() int {
+	return e.Code
 }
 
-func HandlerErrorCustom(code int, message string) error {
-	return &Response{
+func GetStatusCode(err error) int {
+	if err == nil {
+		return 200
+	}
+
+	if e, ok := err.(*Error); ok {
+		return e.StatusCode()
+	}
+
+	return 500
+}
+
+func HandlerError(code int, message string) error {
+	return &Error{
 		Message: message,
 		Code:    code,
 	}

@@ -4,9 +4,10 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"project/go-fiber-boilerplate/config"
-	"project/go-fiber-boilerplate/infrastructure/http/server"
 	"syscall"
+
+	"github.com/saufiroja/online-course-api/config"
+	"github.com/saufiroja/online-course-api/infrastructure/http/server"
 )
 
 func main() {
@@ -19,7 +20,7 @@ func main() {
 
 	go func() {
 		if err := app.Listen(":" + port); err != nil {
-			log.Fatalf("error when listening to :%s, %s", port, err)
+			panic(err)
 		}
 	}()
 
@@ -30,7 +31,7 @@ func main() {
 	log.Println("server gracefully shutdown")
 
 	if err := app.Shutdown(); err != nil {
-		log.Fatalf("error when shutting down the server, %s", err)
+		panic(err)
 	}
 
 	log.Println("process clean up...")
