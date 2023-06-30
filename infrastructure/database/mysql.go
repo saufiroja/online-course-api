@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/saufiroja/online-course-api/config"
-	"github.com/saufiroja/online-course-api/models/entity"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -20,7 +19,7 @@ func NewMysql(conf *config.AppConfig) *gorm.DB {
 
 	//  parse time to gmt+0
 	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		"%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=UTC",
 		user,
 		pass,
 		host,
@@ -29,11 +28,6 @@ func NewMysql(conf *config.AppConfig) *gorm.DB {
 	)
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		log.Panic(err)
-	}
-
-	err = db.AutoMigrate(&entity.User{})
 	if err != nil {
 		log.Panic(err)
 	}

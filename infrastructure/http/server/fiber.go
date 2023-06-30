@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/saufiroja/online-course-api/config"
+	"github.com/saufiroja/online-course-api/infrastructure/database"
 	"github.com/saufiroja/online-course-api/infrastructure/http/routes"
 
 	"github.com/gofiber/fiber/v2"
@@ -12,6 +13,7 @@ import (
 func Server() *fiber.App {
 	conf := config.NewAppConfig()
 	app := fiber.New()
+	database.NewMysql(conf)
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     "*",
