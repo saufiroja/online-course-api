@@ -22,6 +22,10 @@ type AppConfig struct {
 		Name string
 		Ssl  string
 	}
+	SendGrid struct {
+		MailSenderName string
+		MailSenderKey  string
+	}
 }
 
 var appConfig *AppConfig
@@ -38,6 +42,7 @@ func NewAppConfig() *AppConfig {
 		initApp(appConfig)
 		initFiber(appConfig)
 		initMysql(appConfig)
+		initSendGrid(appConfig)
 	}
 
 	return appConfig

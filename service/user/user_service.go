@@ -42,7 +42,13 @@ func (s *service) InsertUser(input *dto.UserRequestBody) (*entity.User, error) {
 		users.CreatedByID = input.CreatedBy
 	}
 
-	return s.r.InsertUser(users)
+	fmt.Println("users", users)
+	res, err := s.r.InsertUser(users)
+	if err != nil {
+		return nil, utils.HandlerError(500, "failed to register user")
+	}
+
+	return res, nil
 }
 
 // CountUser implements interfaces.UserService.
@@ -90,7 +96,6 @@ func (s *service) UpdateUser(id int, input *dto.UserUpdateRequestBody) (*entity.
 	}
 
 	if input.Email != nil {
-		fmt.Println("masuk1")
 		if user.Email != *input.Email {
 			user.Email = *input.Email
 		}
@@ -102,23 +107,19 @@ func (s *service) UpdateUser(id int, input *dto.UserUpdateRequestBody) (*entity.
 	}
 
 	if input.Password != nil {
-		fmt.Println("masuk3")
 		hashedPassword := utils.HashPassword(*input.Password)
 		user.Password = hashedPassword
 	}
 
 	if input.UpdatedBy != nil {
-		fmt.Println("masuk4")
 		user.UpdatedByID = input.UpdatedBy
 	}
 
 	if input.EmailVerifiedAt != nil {
-		fmt.Println("masuk5")
 		user.EmailVerifiedAt = input.EmailVerifiedAt
 	}
 
 	updateUser, err := s.r.UpdateUser(user)
-	fmt.Println("updateUser", err)
 	if err != nil {
 		return nil, utils.HandlerError(500, "failed to update user")
 	}
