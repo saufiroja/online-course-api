@@ -26,6 +26,9 @@ type AppConfig struct {
 		MailSenderName string
 		MailSenderKey  string
 	}
+	Jwt struct {
+		Secret string
+	}
 }
 
 var appConfig *AppConfig
@@ -43,6 +46,7 @@ func NewAppConfig() *AppConfig {
 		initFiber(appConfig)
 		initMysql(appConfig)
 		initSendGrid(appConfig)
+		initJwt(appConfig)
 	}
 
 	return appConfig

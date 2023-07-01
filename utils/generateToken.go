@@ -1,47 +1,107 @@
 package utils
 
 import (
-	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/saufiroja/online-course-api/config"
+	"github.com/saufiroja/online-course-api/models/dto"
+	"github.com/saufiroja/online-course-api/models/entity"
 )
 
-func GenerateAccessToken(id, email, fullname string) (string, int64, error) {
-	secret := os.Getenv("JWT_SECRET")
-	expired := time.Now().Add(time.Hour * 24).Unix()
+func GenerateAccessToken(user *dto.UserResponse, oauthClient *entity.OauthClient, conf *config.AppConfig) (entity.OauthAccessToken, time.Time, error) {
+	expirationTime := time.Now().Add(24 * 365 * time.Hour)
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":       id,
-		"email":    email,
-		"fullname": fullname,
-		"exp":      time.Now().Add(time.Hour * 24).Unix(),
-	})
+	secret := conf.Jwt.Secret
 
-	tokenString, err := token.SignedString([]byte(secret))
-	if err != nil {
-		return "", 0, err
+	claims := &dto.ClaimsReponse{
+		ID:      user.ID,
+		Email:   user.Email,
+		Name:    user.Name,
+		IsAdmin: false,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expirationTime),
+		},
 	}
 
-	return tokenString, expired, nil
+	if oauthClient.Name == "web-admin" {
+		claims.IsAdmin = true
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte(secret))
+	if err != nil {
+		return entity.OauthAccessToken{}, time.Time{}, err
+	}
+
+	oauthAccessToken := entity.OauthAccessToken{
+		OauthClientID: &oauthClient.ID,
+		UserID:        user.ID,
+		Token:         tokenString,
+		Scope:         "*",
+		ExpiredAt:     &expirationTime,
+	}
+
+	return oauthAccessToken, expirationTime, nil
 }
 
-func GenerateRefreshToken(id, email, fullname string) (string, int64, error) {
-	secret := os.Getenv("JWT_SECRET")
+func GenerateRefreshToken(user *dto.UserResponse, oauthAccessToken *entity.OauthAccessToken) (entity.OauthRefreshToken, error) {
+	expirationTimeOauthAccessToken := time.Now().Add(24 * 366 * time.Hour)
 
-	expired := time.Now().Add(time.Hour * 24 * 7).Unix()
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":       id,
-		"email":    email,
-		"fullname": fullname,
-		"exp":      time.Now().Add(time.Hour * 24 * 7).Unix(),
-	})
-
-	tokenString, err := token.SignedString([]byte(secret))
-	if err != nil {
-		return "", 0, err
+	oauthRefreshToken := entity.OauthRefreshToken{
+		OauthAccessTokenID: &oauthAccessToken.ID,
+		UserID:             user.ID,
+		Token:              RandString(128),
+		ExpiredAt:          &expirationTimeOauthAccessToken,
 	}
 
-	return tokenString, expired, nil
+	return oauthRefreshToken, nil
+}
+
+func AccessToken(user *dto.UserResponse, oauthRefresh *entity.OauthRefreshToken, conf *config.AppConfig) (*entity.OauthAccessToken, error) {
+	secret := conf.Jwt.Secret
+	expirationTime := time.Now().Add(24 * 365 * time.Hour)
+
+	claims := &dto.ClaimsReponse{
+		ID:      user.ID,
+		Name:    user.Name,
+		Email:   user.Email,
+		IsAdmin: false,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expirationTime),
+		},
+	}
+
+	if *oauthRefresh.OauthAccessToken.OauthClientID == 2 {
+		claims.IsAdmin = true
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte(secret))
+	if err != nil {
+		return nil, err
+	}
+
+	oauthAccessToken := entity.OauthAccessToken{
+		OauthClientID: oauthRefresh.OauthAccessToken.OauthClientID,
+		UserID:        user.ID,
+		Token:         tokenString,
+		Scope:         "*",
+		ExpiredAt:     &expirationTime,
+	}
+
+	return &oauthAccessToken, nil
+}
+
+func RefreshToken(oauthAccess *entity.OauthAccessToken, oauthRefresh *entity.OauthRefreshToken) (entity.OauthRefreshToken, error) {
+	expirationTimeOauthRefreshToken := time.Now().Add(24 * 366 * time.Hour)
+
+	oauthRefreshToken := entity.OauthRefreshToken{
+		OauthAccessTokenID: &oauthAccess.ID,
+		UserID:             oauthRefresh.UserID,
+		Token:              RandString(128),
+		ExpiredAt:          &expirationTimeOauthRefreshToken,
+	}
+
+	return oauthRefreshToken, nil
 }
