@@ -8,6 +8,7 @@ import (
 	oauthHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/oauth"
 	registerHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/register"
 	userHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/user"
+	"github.com/saufiroja/online-course-api/infrastructure/http/middlewares"
 	"github.com/saufiroja/online-course-api/interfaces"
 	adminRepo "github.com/saufiroja/online-course-api/repository/mysql/admin"
 	forgotPasswordRepo "github.com/saufiroja/online-course-api/repository/mysql/forgetpassword"
@@ -50,34 +51,36 @@ func NewRoutes(
 }
 
 func (r *Routes) initRoutes(app *fiber.App) {
-	user := app.Group("/api/v1")
+	users := app.Group("/api/v1/users")
 	// user
-	user.Post("/users", r.userHandler.InsertUser)
-	user.Get("/users", r.userHandler.FindAllUser)
-	user.Get("/users/:id", r.userHandler.FindUserById)
-	user.Patch("/users/:id", r.userHandler.UpdateUser)
-	user.Delete("/users/:id", r.userHandler.DeleteUser)
+	users.Use(middlewares.MiddlewaresUser, middlewares.MiddlewaresAdmin)
+	users.Post("/", r.userHandler.InsertUser)
+	users.Get("/", r.userHandler.FindAllUser)
+	users.Get("/:id", r.userHandler.FindUserById)
+	users.Patch("/:id", r.userHandler.UpdateUser)
+	users.Delete("/:id", r.userHandler.DeleteUser)
 
 	// register
-	user.Post("/users/register", r.registerHandler.Register)
+	register := app.Group("/api/v1/register")
+	register.Post("/", r.registerHandler.Register)
 
 	// admin
-	admin := app.Group("/api/v1")
-	admin.Post("/admins", r.adminHandler.InsertAdmin)
-	admin.Get("/admins", r.adminHandler.FindAllAdmin)
-	admin.Get("/admins/:id", r.adminHandler.FindOneAdminByID)
-	admin.Patch("/admins/:id", r.adminHandler.UpdateAdmin)
-	admin.Delete("/admins/:id", r.adminHandler.DeleteAdmin)
+	admin := app.Group("/api/v1/admins")
+	admin.Post("/", r.adminHandler.InsertAdmin)
+	admin.Get("/", r.adminHandler.FindAllAdmin)
+	admin.Get("/:id", r.adminHandler.FindOneAdminByID)
+	admin.Patch("/:id", r.adminHandler.UpdateAdmin)
+	admin.Delete("/:id", r.adminHandler.DeleteAdmin)
 
 	// oauth
-	oauth := app.Group("/api/v1")
-	oauth.Post("/oauth/login", r.oauthHandler.Login)
-	oauth.Post("/oauth/refresh", r.oauthHandler.RefreshToken)
+	oauth := app.Group("/api/v1/oauth")
+	oauth.Post("/login", r.oauthHandler.Login)
+	oauth.Post("/refresh", r.oauthHandler.RefreshToken)
 
 	// forgot password
-	forgotPassword := app.Group("/api/v1")
-	forgotPassword.Post("/forgot-password", r.forgotPasswordHandler.InsertForgetPassword)
-	forgotPassword.Put("/forgot-password", r.forgotPasswordHandler.UpdateForgetPassword)
+	forgotPassword := app.Group("/api/v1/forgot-password")
+	forgotPassword.Post("/", r.forgotPasswordHandler.InsertForgetPassword)
+	forgotPassword.Put("/", r.forgotPasswordHandler.UpdateForgetPassword)
 }
 
 func Initilized(app *fiber.App, conf *config.AppConfig) {
