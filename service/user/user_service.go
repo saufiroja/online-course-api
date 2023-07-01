@@ -53,7 +53,12 @@ func (s *service) InsertUser(input *dto.UserRequestBody) (*entity.User, error) {
 
 // CountUser implements interfaces.UserService.
 func (s *service) CountUser() (int64, error) {
-	return s.r.CountUser()
+	count, err := s.r.CountUser()
+	if err != nil {
+		return 0, utils.HandlerError(500, "failed to count user")
+	}
+
+	return count, nil
 }
 
 // DeleteUser implements interfaces.UserService.
@@ -70,22 +75,42 @@ func (s *service) DeleteUser(id int) error {
 
 // FindAllUser implements interfaces.UserService.
 func (s *service) FindAllUser(offset int, limit int) ([]entity.User, error) {
-	return s.r.FindAllUser(offset, limit)
+	users, err := s.r.FindAllUser(offset, limit)
+	if err != nil {
+		return nil, utils.HandlerError(500, "failed to get all user")
+	}
+
+	return users, nil
 }
 
 // FindUserByCodeVerified implements interfaces.UserService.
 func (s *service) FindUserByCodeVerified(codeVerified string) (*entity.User, error) {
-	return s.r.FindUserByCodeVerified(codeVerified)
+	users, err := s.r.FindUserByCodeVerified(codeVerified)
+	if err != nil {
+		return nil, utils.HandlerError(404, "user not found")
+	}
+
+	return users, nil
 }
 
 // FindUserByEmail implements interfaces.UserService.
 func (s *service) FindUserByEmail(email string) (*entity.User, error) {
-	return s.r.FindUserByEmail(email)
+	users, err := s.r.FindUserByEmail(email)
+	if err != nil {
+		return nil, utils.HandlerError(404, "user not found")
+	}
+
+	return users, nil
 }
 
 // FindUserById implements interfaces.UserService.
 func (s *service) FindUserById(id int) (*entity.User, error) {
-	return s.r.FindUserById(id)
+	users, err := s.r.FindUserById(id)
+	if err != nil {
+		return nil, utils.HandlerError(404, "user not found")
+	}
+
+	return users, nil
 }
 
 // UpdateUser implements interfaces.UserService.
@@ -102,7 +127,6 @@ func (s *service) UpdateUser(id int, input *dto.UserUpdateRequestBody) (*entity.
 	}
 
 	if input.Name != nil {
-		fmt.Println(*input.Name, user.Name)
 		user.Name = *input.Name
 	}
 
