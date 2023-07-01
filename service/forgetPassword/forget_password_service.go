@@ -1,4 +1,4 @@
-package forgetpassword
+package forget_password
 
 import (
 	"time"
