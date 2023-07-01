@@ -1,24 +1,24 @@
-name: Go-Fiber-Boilerplate
+# name: Go-Fiber-Boilerplate
 
-on:
-  push:
-    branches: [master]
+# on:
+#   push:
+#     branches: [master]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v2
+#     steps:
+#       - uses: actions/checkout@v2
 
-      - name: Set up Go 1.19
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.19
-        id: go
+#       - name: Set up Go 1.19
+#         uses: actions/setup-go@v2
+#         with:
+#           go-version: 1.19
+#         id: go
 
-      - name: lint
-        run: go get -u golang.org/x/lint/golint
+#       - name: lint
+#         run: go get -u golang.org/x/lint/golint
 
-      - name: build
-        run: go build -o bin/app app/main.go
+#       - name: build
+#         run: go build -o bin/app app/main.go
