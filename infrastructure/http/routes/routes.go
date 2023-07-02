@@ -16,6 +16,7 @@ type Routes struct {
 	forgotPasswordHandler  interfaces.ForgetPasswordHandler
 	productCategoryHandler interfaces.ProductCategoryHandler
 	productHandler         interfaces.ProductHandler
+	discountHandler        interfaces.DiscountHandler
 }
 
 func NewRoutes(
@@ -26,6 +27,7 @@ func NewRoutes(
 	forgotPasswordHandler interfaces.ForgetPasswordHandler,
 	productCategoryHandler interfaces.ProductCategoryHandler,
 	productHandler interfaces.ProductHandler,
+	discountHandler interfaces.DiscountHandler,
 ) *Routes {
 	return &Routes{
 		userHandler:            userHandler,
@@ -35,6 +37,7 @@ func NewRoutes(
 		forgotPasswordHandler:  forgotPasswordHandler,
 		productCategoryHandler: productCategoryHandler,
 		productHandler:         productHandler,
+		discountHandler:        discountHandler,
 	}
 }
 
@@ -88,4 +91,15 @@ func (r *Routes) initRoutes(app *fiber.App) {
 	product.Post("/", r.productHandler.InsertProduct)
 	product.Patch("/:id", r.productHandler.UpdateProductByID)
 	product.Delete("/:id", r.productHandler.DeleteProductByID)
+
+	// discount
+	discount := app.Group("/api/v1/discounts")
+	discount.Use(middlewares.MiddlewaresUser, middlewares.MiddlewaresAdmin)
+	discount.Post("/", r.discountHandler.InsertDiscount)
+	discount.Get("/", r.discountHandler.FindAllDiscount)
+	discount.Get("/:id", r.discountHandler.FindDiscountById)
+	discount.Get("/:code/code", r.discountHandler.FindDiscountByCode)
+	discount.Patch("/:id", r.discountHandler.UpdateDiscountById)
+	discount.Patch("/:id/remaining-quantity", r.discountHandler.UpdateRemainingDiscount)
+	discount.Delete("/:id", r.discountHandler.DeleteDiscountById)
 }
