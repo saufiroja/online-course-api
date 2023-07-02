@@ -51,6 +51,7 @@ func (r *Routes) initRoutes(app *fiber.App) {
 
 	// admin
 	admin := app.Group("/api/v1/admins")
+	admin.Use(middlewares.MiddlewaresUser, middlewares.MiddlewaresAdmin)
 	admin.Post("/", r.adminHandler.InsertAdmin)
 	admin.Get("/", r.adminHandler.FindAllAdmin)
 	admin.Get("/:id", r.adminHandler.FindOneAdminByID)

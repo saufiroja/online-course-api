@@ -27,6 +27,9 @@ func (h *handler) InsertUser(c *fiber.Ctx) error {
 		})
 	}
 
+	admin := utils.CurrentUser(c)
+	input.CreatedBy = &admin.ID
+
 	user, err := h.s.InsertUser(&input)
 	if err != nil {
 		return c.Status(utils.GetStatusCode(err)).JSON(err)
@@ -105,6 +108,9 @@ func (h *handler) UpdateUser(c *fiber.Ctx) error {
 			"message": err.Error(),
 		})
 	}
+
+	admin := utils.CurrentUser(c)
+	input.UpdatedBy = &admin.ID
 
 	user, err := h.s.UpdateUser(ids, &input)
 	if err != nil {

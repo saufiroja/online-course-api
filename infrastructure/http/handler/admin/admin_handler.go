@@ -80,6 +80,9 @@ func (h *handler) InsertAdmin(c *fiber.Ctx) error {
 		})
 	}
 
+	user := utils.CurrentUser(c)
+	admin.CreatedBy = &user.ID
+
 	_, err := h.s.InsertAdmin(admin)
 	if err != nil {
 		return c.Status(utils.GetStatusCode(err)).JSON(err)
@@ -103,6 +106,9 @@ func (h *handler) UpdateAdmin(c *fiber.Ctx) error {
 			"code":    400,
 		})
 	}
+
+	user := utils.CurrentUser(c)
+	admin.UpdatedBy = &user.ID
 
 	_, err := h.s.UpdateAdmin(ids, admin)
 	if err != nil {
