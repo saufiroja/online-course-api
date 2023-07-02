@@ -7,6 +7,7 @@ import (
 	adminHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/admin"
 	forgotPasswordHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/forgetPassword"
 	oauthHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/oauth"
+	productHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/product"
 	productCatgeoryHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/productCategory"
 	registerHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/register"
 	userHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/user"
@@ -15,11 +16,13 @@ import (
 	oauthAccessRepo "github.com/saufiroja/online-course-api/repository/mysql/oauth"
 	oauthClientRepo "github.com/saufiroja/online-course-api/repository/mysql/oauth"
 	oauthRefreshRepo "github.com/saufiroja/online-course-api/repository/mysql/oauth"
+	productRepo "github.com/saufiroja/online-course-api/repository/mysql/product"
 	productCatgeoryRepo "github.com/saufiroja/online-course-api/repository/mysql/productCategory"
 	userRepo "github.com/saufiroja/online-course-api/repository/mysql/user"
 	adminSvc "github.com/saufiroja/online-course-api/service/admin"
 	forgotPasswordSvc "github.com/saufiroja/online-course-api/service/forgetPassword"
 	oauthSvc "github.com/saufiroja/online-course-api/service/oauth"
+	productSvc "github.com/saufiroja/online-course-api/service/product"
 	productCatgeorySvc "github.com/saufiroja/online-course-api/service/productCategory"
 	registerSvc "github.com/saufiroja/online-course-api/service/register"
 	userSvc "github.com/saufiroja/online-course-api/service/user"
@@ -35,6 +38,7 @@ func Initilized(app *fiber.App, conf *config.AppConfig) {
 	oauthClient := oauthClientRepo.NewOauthClientRepository(db)
 	forgotPassword := forgotPasswordRepo.NewForgetPasswordRepository(db)
 	productCategory := productCatgeoryRepo.NewProductCategoryRepository(db)
+	product := productRepo.NewProductRepository(db)
 
 	// service
 	userSvc := userSvc.NewUserService(user)
@@ -43,6 +47,7 @@ func Initilized(app *fiber.App, conf *config.AppConfig) {
 	oauthSvc := oauthSvc.NewOauthService(oauthAccess, oauthClient, oauthRefresh, adminSvc, userSvc, conf)
 	forgotPasswordSvc := forgotPasswordSvc.NewForgetPasswordService(forgotPassword, userSvc, conf)
 	productCategorySvc := productCatgeorySvc.NewProductCategoryService(productCategory, conf)
+	productSvc := productSvc.NewProductService(product, conf)
 
 	// handler
 	userHandler := userHndlr.NewUserHandler(userSvc)
@@ -51,6 +56,7 @@ func Initilized(app *fiber.App, conf *config.AppConfig) {
 	oauthHandler := oauthHndlr.NewOauthHandler(oauthSvc)
 	forgotPasswordHandler := forgotPasswordHndlr.NewForgetPasswordHandler(forgotPasswordSvc)
 	productCategoryHandler := productCatgeoryHndlr.NewProductCategoryHandler(productCategorySvc)
+	productHandler := productHndlr.NewProductHandler(productSvc)
 
 	routes := NewRoutes(
 		userHandler,
@@ -59,6 +65,7 @@ func Initilized(app *fiber.App, conf *config.AppConfig) {
 		oauthHandler,
 		forgotPasswordHandler,
 		productCategoryHandler,
+		productHandler,
 	)
 
 	routes.initRoutes(app)

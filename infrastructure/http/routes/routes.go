@@ -15,6 +15,7 @@ type Routes struct {
 	oauthHandler           interfaces.OauthHandler
 	forgotPasswordHandler  interfaces.ForgetPasswordHandler
 	productCategoryHandler interfaces.ProductCategoryHandler
+	productHandler         interfaces.ProductHandler
 }
 
 func NewRoutes(
@@ -24,6 +25,7 @@ func NewRoutes(
 	oauthHandler interfaces.OauthHandler,
 	forgotPasswordHandler interfaces.ForgetPasswordHandler,
 	productCategoryHandler interfaces.ProductCategoryHandler,
+	productHandler interfaces.ProductHandler,
 ) *Routes {
 	return &Routes{
 		userHandler:            userHandler,
@@ -32,6 +34,7 @@ func NewRoutes(
 		oauthHandler:           oauthHandler,
 		forgotPasswordHandler:  forgotPasswordHandler,
 		productCategoryHandler: productCategoryHandler,
+		productHandler:         productHandler,
 	}
 }
 
@@ -76,4 +79,13 @@ func (r *Routes) initRoutes(app *fiber.App) {
 	productCategory.Get("/:id", r.productCategoryHandler.FindProductCategoryByID)
 	productCategory.Patch("/:id", r.productCategoryHandler.UpdateProductCategory)
 	productCategory.Delete("/:id", r.productCategoryHandler.DeleteProductCategory)
+
+	// product
+	product := app.Group("/api/v1/products")
+	product.Get("/", r.productHandler.FindAllProduct)
+	product.Get("/:id", r.productHandler.FindProductByID)
+	product.Use(middlewares.MiddlewaresUser, middlewares.MiddlewaresAdmin)
+	product.Post("/", r.productHandler.InsertProduct)
+	product.Patch("/:id", r.productHandler.UpdateProductByID)
+	product.Delete("/:id", r.productHandler.DeleteProductByID)
 }
