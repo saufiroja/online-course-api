@@ -1,8 +1,6 @@
 package config
 
 import (
-	"log"
-
 	"github.com/joho/godotenv"
 )
 
@@ -29,6 +27,11 @@ type AppConfig struct {
 	Jwt struct {
 		Secret string
 	}
+	Cloudinary struct {
+		CloudName string
+		ApiKey    string
+		ApiSecret string
+	}
 }
 
 var appConfig *AppConfig
@@ -36,7 +39,7 @@ var appConfig *AppConfig
 func NewAppConfig() *AppConfig {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		panic(err)
 	}
 
 	if appConfig == nil {
@@ -47,6 +50,7 @@ func NewAppConfig() *AppConfig {
 		initMysql(appConfig)
 		initSendGrid(appConfig)
 		initJwt(appConfig)
+		initCloudinary(appConfig)
 	}
 
 	return appConfig

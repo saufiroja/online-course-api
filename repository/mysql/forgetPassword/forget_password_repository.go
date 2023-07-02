@@ -1,4 +1,4 @@
-package forget_password
+package forgetPassword
 
 import (
 	"github.com/saufiroja/online-course-api/interfaces"

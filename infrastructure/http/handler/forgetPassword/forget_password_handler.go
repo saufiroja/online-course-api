@@ -1,4 +1,4 @@
-package forget_password
+package forgetPassword
 
 import (
 	fiber "github.com/gofiber/fiber/v2"

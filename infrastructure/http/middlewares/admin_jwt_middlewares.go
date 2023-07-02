@@ -2,15 +2,13 @@ package middlewares
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/saufiroja/online-course-api/models/dto"
+	"github.com/saufiroja/online-course-api/utils"
 )
 
 func MiddlewaresAdmin(c *fiber.Ctx) error {
-	user := c.Locals("user")
+	user := utils.CurrentUser(c)
 
-	users := user.(*dto.MapClaimsResponse)
-
-	if !users.IsAdmin {
+	if !user.IsAdmin {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"message": "you are not admin",
 			"code":    401,
