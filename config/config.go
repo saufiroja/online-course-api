@@ -32,6 +32,10 @@ type AppConfig struct {
 		ApiKey    string
 		ApiSecret string
 	}
+	Xendit struct {
+		SecretKey  string
+		SuccessUrl string
+	}
 }
 
 var appConfig *AppConfig
@@ -51,6 +55,7 @@ func NewAppConfig() *AppConfig {
 		initSendGrid(appConfig)
 		initJwt(appConfig)
 		initCloudinary(appConfig)
+		initXendit(appConfig)
 	}
 
 	return appConfig
