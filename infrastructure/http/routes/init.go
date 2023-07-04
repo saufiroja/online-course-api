@@ -5,6 +5,7 @@ import (
 	"github.com/saufiroja/online-course-api/config"
 	"github.com/saufiroja/online-course-api/infrastructure/database"
 	adminHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/admin"
+	cartHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/cart"
 	discountHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/discount"
 	forgotPasswordHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/forgetPassword"
 	oauthHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/oauth"
@@ -13,6 +14,7 @@ import (
 	registerHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/register"
 	userHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/user"
 	adminRepo "github.com/saufiroja/online-course-api/repository/mysql/admin"
+	cartRepo "github.com/saufiroja/online-course-api/repository/mysql/cart"
 	discountRepo "github.com/saufiroja/online-course-api/repository/mysql/discount"
 	forgotPasswordRepo "github.com/saufiroja/online-course-api/repository/mysql/forgetPassword"
 	oauthAccessRepo "github.com/saufiroja/online-course-api/repository/mysql/oauth"
@@ -22,6 +24,7 @@ import (
 	productCatgeoryRepo "github.com/saufiroja/online-course-api/repository/mysql/productCategory"
 	userRepo "github.com/saufiroja/online-course-api/repository/mysql/user"
 	adminSvc "github.com/saufiroja/online-course-api/service/admin"
+	cartSvc "github.com/saufiroja/online-course-api/service/cart"
 	discountSvc "github.com/saufiroja/online-course-api/service/discount"
 	forgotPasswordSvc "github.com/saufiroja/online-course-api/service/forgetPassword"
 	oauthSvc "github.com/saufiroja/online-course-api/service/oauth"
@@ -43,6 +46,7 @@ func Initilized(app *fiber.App, conf *config.AppConfig) {
 	productCategory := productCatgeoryRepo.NewProductCategoryRepository(db)
 	product := productRepo.NewProductRepository(db)
 	discount := discountRepo.NewDiscountRepository(db)
+	cart := cartRepo.NewCartRepository(db)
 
 	// service
 	userSvc := userSvc.NewUserService(user)
@@ -53,6 +57,7 @@ func Initilized(app *fiber.App, conf *config.AppConfig) {
 	productCategorySvc := productCatgeorySvc.NewProductCategoryService(productCategory, conf)
 	productSvc := productSvc.NewProductService(product, conf)
 	discountSvc := discountSvc.NewDiscountService(discount)
+	cartSvc := cartSvc.NewCartService(cart)
 
 	// handler
 	userHandler := userHndlr.NewUserHandler(userSvc)
@@ -63,6 +68,7 @@ func Initilized(app *fiber.App, conf *config.AppConfig) {
 	productCategoryHandler := productCatgeoryHndlr.NewProductCategoryHandler(productCategorySvc)
 	productHandler := productHndlr.NewProductHandler(productSvc)
 	discountHandler := discountHndlr.NewDiscountHandler(discountSvc)
+	cartHandler := cartHndlr.NewCartHandler(cartSvc)
 
 	routes := NewRoutes(
 		userHandler,
@@ -73,6 +79,7 @@ func Initilized(app *fiber.App, conf *config.AppConfig) {
 		productCategoryHandler,
 		productHandler,
 		discountHandler,
+		cartHandler,
 	)
 
 	routes.initRoutes(app)
