@@ -39,7 +39,7 @@ func (s *service) DeleteCart(id, userId int) error {
 }
 
 // DeleteCartByUserId implements interfaces.CartService.
-func (s *service) DeleteCartByUserId(userId int, input dto.CartRequestUpdateBody) error {
+func (s *service) DeleteCartByUserId(userId int) error {
 	err := s.r.DeleteCartByUserId(userId)
 	if err != nil {
 		return utils.HandlerError(404, "Cart not found")

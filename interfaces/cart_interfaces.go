@@ -21,7 +21,7 @@ type CartService interface {
 	InsertCart(input dto.CartRequestBody) (*entity.Cart, error)
 	UpdateCart(id int, input dto.CartRequestUpdateBody) (*entity.Cart, error)
 	DeleteCart(id, userId int) error
-	DeleteCartByUserId(userId int, input dto.CartRequestUpdateBody) error
+	DeleteCartByUserId(userId int) error
 }
 
 type CartHandler interface {

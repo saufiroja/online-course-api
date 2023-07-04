@@ -127,7 +127,7 @@ func (s *service) UpdateRemainingDiscount(id int, input dto.DiscountRemainingQua
 
 	if input.Operator == "+" {
 		discount.RemainingQuantity += input.Quantity
-	} else {
+	} else if input.Operator == "-" {
 		discount.RemainingQuantity -= input.Quantity
 	}
 

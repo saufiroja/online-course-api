@@ -20,7 +20,7 @@ func NewPaymentService(conf *config.AppConfig) interfaces.PaymentService {
 }
 
 // CreatePayment implements interfaces.PaymentService.
-func (s *service) CreatePayment(input dto.PaymentRequestBody) (*xendit.Invoice, error) {
+func (s *service) InsertPayment(input dto.PaymentRequestBody) (*xendit.Invoice, error) {
 	xendit.Opt.SecretKey = s.conf.Xendit.SecretKey
 	url := s.conf.Xendit.SuccessUrl
 
@@ -33,10 +33,10 @@ func (s *service) CreatePayment(input dto.PaymentRequestBody) (*xendit.Invoice, 
 			Email: input.PayerEmail,
 		},
 		CustomerNotificationPreference: xendit.InvoiceCustomerNotificationPreference{
-			InvoiceCreated:  []string{"EMAIL"},
-			InvoicePaid:     []string{"EMAIL"},
-			InvoiceReminder: []string{"EMAIL"},
-			InvoiceExpired:  []string{"EMAIL"},
+			InvoiceCreated:  []string{"email"},
+			InvoicePaid:     []string{"email"},
+			InvoiceReminder: []string{"email"},
+			InvoiceExpired:  []string{"email"},
 		},
 		InvoiceDuration:    86400,
 		SuccessRedirectURL: url,

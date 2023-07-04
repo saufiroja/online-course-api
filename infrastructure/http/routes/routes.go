@@ -18,6 +18,7 @@ type Routes struct {
 	productHandler         interfaces.ProductHandler
 	discountHandler        interfaces.DiscountHandler
 	cartHandler            interfaces.CartHandler
+	orderHandler           interfaces.OrderHandler
 }
 
 func NewRoutes(
@@ -30,6 +31,7 @@ func NewRoutes(
 	productHandler interfaces.ProductHandler,
 	discountHandler interfaces.DiscountHandler,
 	cartHandler interfaces.CartHandler,
+	orderHandler interfaces.OrderHandler,
 ) *Routes {
 	return &Routes{
 		userHandler:            userHandler,
@@ -41,6 +43,7 @@ func NewRoutes(
 		productHandler:         productHandler,
 		discountHandler:        discountHandler,
 		cartHandler:            cartHandler,
+		orderHandler:           orderHandler,
 	}
 }
 
@@ -113,4 +116,11 @@ func (r *Routes) initRoutes(app *fiber.App) {
 	cart.Get("/", r.cartHandler.FindAllCartByUserId)
 	cart.Patch("/:id", r.cartHandler.UpdateCart)
 	cart.Delete("/:id", r.cartHandler.DeleteCart)
+
+	// order
+	order := app.Group("/api/v1/orders")
+	order.Use(middlewares.MiddlewaresUser)
+	order.Post("/", r.orderHandler.InsertOrder)
+	order.Get("/", r.orderHandler.FindAllOrdersByUserId)
+	order.Get("/:id", r.orderHandler.FindOrderById)
 }

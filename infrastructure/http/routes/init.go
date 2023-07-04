@@ -9,6 +9,7 @@ import (
 	discountHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/discount"
 	forgotPasswordHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/forgetPassword"
 	oauthHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/oauth"
+	orderHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/order"
 	productHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/product"
 	productCatgeoryHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/productCategory"
 	registerHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/register"
@@ -20,6 +21,8 @@ import (
 	oauthAccessRepo "github.com/saufiroja/online-course-api/repository/mysql/oauth"
 	oauthClientRepo "github.com/saufiroja/online-course-api/repository/mysql/oauth"
 	oauthRefreshRepo "github.com/saufiroja/online-course-api/repository/mysql/oauth"
+	orderRepo "github.com/saufiroja/online-course-api/repository/mysql/order"
+	orderDetailRepo "github.com/saufiroja/online-course-api/repository/mysql/orderDetail"
 	productRepo "github.com/saufiroja/online-course-api/repository/mysql/product"
 	productCatgeoryRepo "github.com/saufiroja/online-course-api/repository/mysql/productCategory"
 	userRepo "github.com/saufiroja/online-course-api/repository/mysql/user"
@@ -28,6 +31,9 @@ import (
 	discountSvc "github.com/saufiroja/online-course-api/service/discount"
 	forgotPasswordSvc "github.com/saufiroja/online-course-api/service/forgetPassword"
 	oauthSvc "github.com/saufiroja/online-course-api/service/oauth"
+	orderSvc "github.com/saufiroja/online-course-api/service/order"
+	orderDetailSvc "github.com/saufiroja/online-course-api/service/orderDetail"
+	paymentSvc "github.com/saufiroja/online-course-api/service/payment"
 	productSvc "github.com/saufiroja/online-course-api/service/product"
 	productCatgeorySvc "github.com/saufiroja/online-course-api/service/productCategory"
 	registerSvc "github.com/saufiroja/online-course-api/service/register"
@@ -47,6 +53,8 @@ func Initilized(app *fiber.App, conf *config.AppConfig) {
 	product := productRepo.NewProductRepository(db)
 	discount := discountRepo.NewDiscountRepository(db)
 	cart := cartRepo.NewCartRepository(db)
+	order := orderRepo.NewOrderRepository(db)
+	orderDetail := orderDetailRepo.NewOrderDetailRepository(db)
 
 	// service
 	userSvc := userSvc.NewUserService(user)
@@ -58,6 +66,9 @@ func Initilized(app *fiber.App, conf *config.AppConfig) {
 	productSvc := productSvc.NewProductService(product, conf)
 	discountSvc := discountSvc.NewDiscountService(discount)
 	cartSvc := cartSvc.NewCartService(cart)
+	orderDetailSvc := orderDetailSvc.NewOrderDetailService(orderDetail)
+	paymentSvc := paymentSvc.NewPaymentService(conf)
+	orderSvc := orderSvc.NewOrderService(order, cartSvc, discountSvc, productSvc, orderDetailSvc, paymentSvc)
 
 	// handler
 	userHandler := userHndlr.NewUserHandler(userSvc)
@@ -69,6 +80,7 @@ func Initilized(app *fiber.App, conf *config.AppConfig) {
 	productHandler := productHndlr.NewProductHandler(productSvc)
 	discountHandler := discountHndlr.NewDiscountHandler(discountSvc)
 	cartHandler := cartHndlr.NewCartHandler(cartSvc)
+	orderHandler := orderHndlr.NewOrderHandler(orderSvc)
 
 	routes := NewRoutes(
 		userHandler,
@@ -80,6 +92,7 @@ func Initilized(app *fiber.App, conf *config.AppConfig) {
 		productHandler,
 		discountHandler,
 		cartHandler,
+		orderHandler,
 	)
 
 	routes.initRoutes(app)

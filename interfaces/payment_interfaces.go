@@ -6,5 +6,5 @@ import (
 )
 
 type PaymentService interface {
-	CreatePayment(input dto.PaymentRequestBody) (*xendit.Invoice, error)
+	InsertPayment(input dto.PaymentRequestBody) (*xendit.Invoice, error)
 }
