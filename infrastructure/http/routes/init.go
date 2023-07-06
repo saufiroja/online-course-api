@@ -15,6 +15,7 @@ import (
 	productCatgeoryHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/productCategory"
 	registerHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/register"
 	userHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/user"
+	webhookHndlr "github.com/saufiroja/online-course-api/infrastructure/http/handler/webhook"
 	adminRepo "github.com/saufiroja/online-course-api/repository/mysql/admin"
 	cartRepo "github.com/saufiroja/online-course-api/repository/mysql/cart"
 	classRoomRepo "github.com/saufiroja/online-course-api/repository/mysql/classRoom"
@@ -41,6 +42,7 @@ import (
 	productCatgeorySvc "github.com/saufiroja/online-course-api/service/productCategory"
 	registerSvc "github.com/saufiroja/online-course-api/service/register"
 	userSvc "github.com/saufiroja/online-course-api/service/user"
+	webhookSvc "github.com/saufiroja/online-course-api/service/webhook"
 )
 
 func Initilized(app *fiber.App, conf *config.AppConfig) {
@@ -74,6 +76,7 @@ func Initilized(app *fiber.App, conf *config.AppConfig) {
 	paymentSvc := paymentSvc.NewPaymentService(conf)
 	orderSvc := orderSvc.NewOrderService(order, cartSvc, discountSvc, productSvc, orderDetailSvc, paymentSvc)
 	classRoomSvc := classRoomSvc.NewClassRoomService(classRoom)
+	webhookSvc := webhookSvc.NewWebhookService(orderSvc, classRoomSvc, conf)
 
 	// handler
 	userHandler := userHndlr.NewUserHandler(userSvc)
@@ -87,6 +90,7 @@ func Initilized(app *fiber.App, conf *config.AppConfig) {
 	cartHandler := cartHndlr.NewCartHandler(cartSvc)
 	orderHandler := orderHndlr.NewOrderHandler(orderSvc)
 	classRoomHandler := classRoomHndlr.NewClassRoomHandler(classRoomSvc)
+	webhookHandler := webhookHndlr.NewWebhookHandler(webhookSvc)
 
 	routes := NewRoutes(
 		userHandler,
@@ -100,6 +104,7 @@ func Initilized(app *fiber.App, conf *config.AppConfig) {
 		cartHandler,
 		orderHandler,
 		classRoomHandler,
+		webhookHandler,
 	)
 
 	routes.initRoutes(app)

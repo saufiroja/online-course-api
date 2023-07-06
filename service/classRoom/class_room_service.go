@@ -1,10 +1,13 @@
 package classroom
 
 import (
+	"errors"
+
 	"github.com/saufiroja/online-course-api/interfaces"
 	"github.com/saufiroja/online-course-api/models/dto"
 	"github.com/saufiroja/online-course-api/models/entity"
 	"github.com/saufiroja/online-course-api/utils"
+	"gorm.io/gorm"
 )
 
 type service struct {
@@ -42,7 +45,7 @@ func (s *service) FindOneClassRoomByUserIDAndProductID(userID int, productID int
 // InsertClassRoom implements interfaces.ClassRoomService.
 func (s *service) InsertClassRoom(input dto.ClassRoomRequestBody) (*entity.ClassRoom, error) {
 	classRoom, err := s.r.FindOneClassRoomByUserIDAndProductID(int(input.UserID), int(input.ProductID))
-	if err != nil {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, utils.HandlerError(404, "classroom not found")
 	}
 

@@ -17,7 +17,7 @@ type OrderRepository interface {
 
 type OrderService interface {
 	FindAllOrdersByUserId(userId, offset, limit int) ([]entity.Order, error)
-	FindOrderByExternalId(externalId string) (entity.Order, error)
+	FindOrderByExternalId(externalId string) (*entity.Order, error)
 	FindOrderById(id int) (entity.Order, error)
 	InsertOrder(input dto.OrderRequestBody) (entity.Order, error)
 	UpdateOrder(id int, input dto.OrderRequestBody) (entity.Order, error)

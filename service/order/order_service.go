@@ -59,13 +59,13 @@ func (s *service) FindAllOrdersByUserId(userId int, offset int, limit int) ([]en
 }
 
 // FindOrderByExternalId implements interfaces.OrderService.
-func (s *service) FindOrderByExternalId(externalId string) (entity.Order, error) {
+func (s *service) FindOrderByExternalId(externalId string) (*entity.Order, error) {
 	order, err := s.r.FindOrderByExternalId(externalId)
 	if err != nil {
-		return order, utils.HandlerError(404, "order not found")
+		return nil, utils.HandlerError(404, "order not found")
 	}
 
-	return order, nil
+	return &order, nil
 }
 
 // FindOrderById implements interfaces.OrderService.

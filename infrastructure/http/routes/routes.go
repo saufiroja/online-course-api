@@ -20,6 +20,7 @@ type Routes struct {
 	cartHandler            interfaces.CartHandler
 	orderHandler           interfaces.OrderHandler
 	classRoomHandler       interfaces.ClassRoomHandler
+	webhookHandler         interfaces.WebhookHandler
 }
 
 func NewRoutes(
@@ -34,6 +35,7 @@ func NewRoutes(
 	cartHandler interfaces.CartHandler,
 	orderHandler interfaces.OrderHandler,
 	classRoomHandler interfaces.ClassRoomHandler,
+	webhookHandler interfaces.WebhookHandler,
 ) *Routes {
 	return &Routes{
 		userHandler:            userHandler,
@@ -47,6 +49,7 @@ func NewRoutes(
 		cartHandler:            cartHandler,
 		orderHandler:           orderHandler,
 		classRoomHandler:       classRoomHandler,
+		webhookHandler:         webhookHandler,
 	}
 }
 
@@ -131,4 +134,8 @@ func (r *Routes) initRoutes(app *fiber.App) {
 	classRoom := app.Group("/api/v1/class-rooms")
 	classRoom.Use(middlewares.MiddlewaresUser)
 	classRoom.Get("/", r.classRoomHandler.FindAllClassRoomsByUserID)
+
+	// webhook
+	webhook := app.Group("/api/v1/webhooks")
+	webhook.Post("/:id", r.webhookHandler.UpdatePayment)
 }
